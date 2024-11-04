@@ -298,16 +298,16 @@ def publications():
 # SHARES
 def shares():
     data = []
-
     shares_check = set()
-    profile = random.randint(0, records_nb.PROFILES-1)
-    post = random.randint(0, records_nb.POSTS-1)
-    share_check = frozenset((profile, post))
-    while share_check in shares_check:
+    for i in range(records_nb.SHARES):
         profile = random.randint(0, records_nb.PROFILES-1)
         post = random.randint(0, records_nb.POSTS-1)
         share_check = frozenset((profile, post))
-    for i in range(records_nb.SHARES):
+        while share_check in shares_check:
+            profile = random.randint(0, records_nb.PROFILES-1)
+            post = random.randint(0, records_nb.POSTS-1)
+            share_check = frozenset((profile, post))
+        shares_check.add(share_check)
         row = {
             'ID': i,
             'FK_Profile': profile,
