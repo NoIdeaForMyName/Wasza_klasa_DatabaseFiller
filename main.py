@@ -11,9 +11,17 @@ DATABASE_USER = 'postgres'
 DATABASE_PASSWORD = 'postgres'
 
 
+# def insert_rows(cursor, rows, table_name):
+#     for row in rows:
+#         cursor.execute(f"INSERT INTO {table_name} ({', '.join(row.keys())}) VALUES ({', '.join(['%s' for _ in range(len(row))])})", list(row.values()))
+
 def insert_rows(cursor, rows, table_name):
-    for row in rows:
-        cursor.execute(f"INSERT INTO {table_name} ({', '.join(row.keys())}) VALUES ({', '.join(['%s' for _ in range(len(row))])})", list(row.values()))
+    if not rows:
+        return
+    columns = rows[0].keys()
+    query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(['%s' for _ in columns])})"
+    values = [list(row.values()) for row in rows]
+    psycopg2.extras.execute_batch(cursor, query, values)
 
 
 # Connect to the default database to execute the DROP DATABASE and later CREATE DATABASE commands
