@@ -35,6 +35,7 @@ def profiles():
     prev_emails = set()
 
     for i in range(records_nb.PROFILES):
+        print(f"Profiles iteration: {i}")
         email = fake.email()
         while email in prev_emails:
             email = fake.email()
@@ -61,6 +62,7 @@ def chats(): # date of chat start moze byc starsza niz data zalozenia ktoregos k
     data = []
     send_receiv_check = set()
     for i in range(records_nb.CHATS):
+        print(f"Chats iteration: {i}")
         sender, receiver = random.sample(range(records_nb.PROFILES), 2)
         pair = frozenset((sender, receiver))
         while pair in send_receiv_check:
@@ -82,6 +84,7 @@ def friendships(): # DateOfFriendshipStart moze byc starsza niz data zalozenia k
     data = []
     invit_receiv_check = set()
     for i in range(records_nb.FRIENDSHIPS):
+        print(f"Friendships iteration: {i}")
         inviter, receiver = random.sample(range(records_nb.PROFILES), 2)
         pair = frozenset((inviter, receiver))
         while pair in invit_receiv_check:
@@ -102,6 +105,7 @@ def friendships(): # DateOfFriendshipStart moze byc starsza niz data zalozenia k
 def groups():
     data = []
     for i in range(records_nb.GROUPS):
+        print(f"Groups iteration: {i}")
         row = {
             'ID': i,
             'Name': fake.text(max_nb_chars=20)[:-1]
@@ -114,7 +118,7 @@ def groups():
 def posts():
     data=[]
     for i in range(records_nb.POSTS):
-        print(f"Iteration: {i}")
+        print(f"Posts iteration: {i}")
         row = {
             'ID': i,
             'FK_Author': random.choice(range(records_nb.PROFILES)),
@@ -130,7 +134,7 @@ def posts():
 def comments():
     data = []
     for i in range(records_nb.COMMENTS):
-        print(f"Iteration: {i}")
+        print(f"Comments iteration: {i}")
         row = {
             'ID': i,
             'FK_CommentProfile': random.choice(range(records_nb.PROFILES)),
@@ -147,6 +151,7 @@ def types():
     reaction_types = ["Like", "Love", "Haha", "Wow", "Sad", "Angry", "Kitten", "Dislike", "Celebrate"]
 
     for i, name in enumerate(reaction_types):  # Limit to the number specified in records_nb.TYPES
+        print(f"Types iteration: {i}")
         row = {
             'ID': i,
             'Name': name
@@ -159,7 +164,7 @@ def types():
 def reactions():
     data = []
     for i in range(records_nb.REACTIONS):
-        print(f"Iteration: {i}")
+        print(f"Reactions iteration: {i}")
         row = {
             'ID': i,
             'FK_ReactionProfile': random.choice(range(records_nb.PROFILES)),
@@ -175,6 +180,7 @@ def reactions():
 def rooms():
     data = []
     for i in range(records_nb.ROOMS):
+        print(f"Rooms iteration: {i}")
         row = {
             'ID': i,
             'Name': fake.text(max_nb_chars=20)[:-1],
@@ -189,6 +195,7 @@ def roles():
     roles = ['room_administrator', 'room_member']
     data = []
     for i in range(len(roles)):
+        print(f"Roles iteration: {i}")
         row = {
             'ID': i,
             'Name': roles[i]
@@ -207,6 +214,7 @@ def participations():
         selected_profiles = random.sample(range(records_nb.PROFILES), participants_count)
 
         for participant in range(participants_count):
+            print(f"Participations iteration: {participation_id}")
             role = 0 if participant < 2 else 1
             startdate_raw = fake.date_this_century()
             days_to_add = random.randint(5, 180)
@@ -228,6 +236,7 @@ def participations():
 def notifications():
     data = []
     for i in range(records_nb.NOTIFICATIONS):
+        print(f"Notifications iteration: {i}")
         row = {
             'ID': i,
             'Content': fake.text(max_nb_chars=100)[:-1],
@@ -241,6 +250,7 @@ def notifications():
 def albums():
     data = []
     for i in range(records_nb.ALBUMS):
+        print(f"Albums iteration: {i}")
         row = {
             'ID': i,
             'Name': fake.text(max_nb_chars=50)[:-1],
@@ -254,6 +264,7 @@ def albums():
 def extensions():
     data = []
     for i in range(records_nb.EXTENSIONS):
+        print(f"Extensions iteration: {i}")
         ext = fake.file_extension()
         while len(ext) > 5:
             ext = fake.file_extension()
@@ -270,6 +281,7 @@ def media():
     data = []
 
     for i in range(records_nb.MEDIA):
+        print(f"Media iteration: {i}")
         path = fake.text(max_nb_chars=500)
         row = {
             'ID': i,
@@ -286,6 +298,7 @@ def media():
 def publications():
     data = []
     for i in range(records_nb.PUBLICATIONS):
+        print(f"Publications iteration: {i}")
         row = {
             'ID': i,
             'FK_Media': random.choice(range(records_nb.MEDIA)),
@@ -300,6 +313,7 @@ def shares():
     data = []
     shares_check = set()
     for i in range(records_nb.SHARES):
+        print(f"Shares iteration: {i}")
         profile = random.randint(0, records_nb.PROFILES-1)
         post = random.randint(0, records_nb.POSTS-1)
         share_check = frozenset((profile, post))
@@ -323,6 +337,7 @@ def permissions():
     data = []
     permissions = ['Group Admin', 'Group Moderator', 'Group User']
     for i in range(len(permissions)):
+        print(f"Permissions iteration: {i}")
         row = {
             'ID': i,
             'Name': permissions[i],
@@ -340,6 +355,7 @@ def affiliations():
         selected_profiles = random.sample(range(records_nb.PROFILES), affiliations_count)
 
         for affiliation in range(affiliations_count):
+            print(f"Affiliations iteration: {id_counter}")
             permission = 0 if affiliation < 1 else (1 if abs(random.gauss(0, 1)) > 1.8 else 2)
             startdate = fake.date_this_century()
             days_to_add = random.randint(5, 180)
@@ -401,6 +417,7 @@ def messages(chats, participations, media):
         messages_to_create = int(random.gauss(messages_to_create, messages_to_create*0.6))
 
         for _ in range(messages_to_create):
+            print(f"Messages iteration: {current_id}")
             sender = chat['FK_Sender' if random.random()>0.5 else 'FK_Receiver']
             curr_media, content = get_media_and_content(sender)
             row = {
@@ -423,6 +440,7 @@ def messages(chats, participations, media):
         created_messages += messages_to_create
 
         for _ in range(messages_to_create):
+            print(f"Messages iteration: {current_id}")
             room = participation['FK_Room']
             sender = participation['FK_ParticipantProfile']
             curr_media, content = get_media_and_content(sender)
