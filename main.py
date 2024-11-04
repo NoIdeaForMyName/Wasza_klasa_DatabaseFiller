@@ -1,16 +1,19 @@
 import psycopg2
 from psycopg2 import sql
+
 import generators
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Pool, cpu_count
 
 DEFAULT_DATABASE_NAME = 'postgres'
 DATABASE_NAME = 'Wasza_klasa'
 DATABASE_USER = 'postgres'
 DATABASE_PASSWORD = 'postgres'
 
+
 def insert_rows(cursor, rows, table_name):
     for row in rows:
         cursor.execute(f"INSERT INTO {table_name} ({', '.join(row.keys())}) VALUES ({', '.join(['%s' for _ in range(len(row))])})", list(row.values()))
-    print(f'Table {table_name} filled')
 
 
 # Connect to the default database to execute the DROP DATABASE and later CREATE DATABASE commands
@@ -45,20 +48,58 @@ conn.close()
 print("Database structure created")
 
 
-# Reconnect to create the new database and execute further commands
-conn = psycopg2.connect(f"dbname={DATABASE_NAME} user={DATABASE_USER} password={DATABASE_PASSWORD}")
-cursor = conn.cursor()
+def insert_data(rows, table_name):
+    try:
+        # connecting with database
+        with psycopg2.connect(f"dbname={DATABASE_NAME} user={DATABASE_USER} password={DATABASE_PASSWORD}") as conn:
+            with conn.cursor() as cursor:
+                # inserting rows to the table
+                insert_rows(cursor,rows,table_name)
+            conn.commit()  # confirming transaction
+        print(f'Table {table_name} filled')
+    except psycopg2.DatabaseError as e:
+        print(f"Error during inserting data to the table {table_name}: {e}")
 
-# profiles = generators.profiles()
-# for profile in profiles:
-#     cursor.execute(f"INSERT INTO Profiles ({', '.join(profile.keys())}) VALUES ({', '.join(['%s' for _ in range(len(profile))])})", list(profile.values()))
 
-insert_rows(cursor, generators.profiles(), 'Profiles')
-insert_rows(cursor, generators.chats(), 'Chats')
-insert_rows(cursor, generators.friendships(), 'Friendships')
-insert_rows(cursor, generators.groups(), 'Groups')
+tables_and_generators = {
+    'Permissions':generators.permissions,
+    'Rooms':generators.rooms,
+    'Roles':generators.roles,
+    'Types':generators.types,
+    'Extensions': generators.extensions,
+    'Profiles': generators.profiles,
+    'Chats': generators.chats,
+    'Friendships': generators.friendships,
+    'Groups': generators.groups,
+    'Affiliations':generators.affiliations,
+    'Posts': generators.posts,
+    'Shares':generators.shares,
+    'Albums':generators.albums,
+    'Media':generators.media,
+    'Publications':generators.publications,
+    'Comments':generators.comments,
+    'Reactions':generators.reactions,
+    'Notifications':generators.notifications,
+    'Participations':generators.participations,
+}
 
-conn.commit()
+data = {}
+with ThreadPoolExecutor() as executor:
+    # creating threads for generators
+    futures = {table: executor.submit(generator) for table, generator in tables_and_generators.items()}
+
+    # waiting for the results
+    for table, future in futures.items():
+        try:
+            data[table] = future.result()  # getting generated data
+        except Exception as e:
+            print(f"Error generating data for {table}: {e}")
+
+    data["Messages"]=generators.messages(data['Chats'],data["Participations"],data['Media'])
+    
+# Sequentially insert generated data
+for table, rows in data.items():
+    insert_data(rows, table)
 
 cursor.close()
 conn.close()
