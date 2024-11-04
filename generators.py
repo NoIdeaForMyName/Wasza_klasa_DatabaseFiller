@@ -121,8 +121,8 @@ def posts():
         print(f"Posts iteration: {i}")
         row = {
             'ID': i,
-            'FK_Author': random.choice(range(records_nb.PROFILES)),
-            'FK_Group': random.choice(range(records_nb.GROUPS)),
+            'FK_Author': random.randint(0, records_nb.PROFILES-1),
+            'FK_Group': random.randint(0, records_nb.GROUPS-1),
             'Content': fake.text(max_nb_chars=20000),
             "DateOfPublication":fake.date_this_century().strftime(date_format)
         }
@@ -137,8 +137,8 @@ def comments():
         print(f"Comments iteration: {i}")
         row = {
             'ID': i,
-            'FK_CommentProfile': random.choice(range(records_nb.PROFILES)),
-            'FK_CommentedPost': random.choice(range(records_nb.POSTS)),
+            'FK_CommentProfile': random.randint(0, records_nb.PROFILES-1),
+            'FK_CommentedPost': random.randint(0, records_nb.POSTS-1),
             'Content': fake.text(max_nb_chars=5000),
         }
         data.append(row)
@@ -167,9 +167,9 @@ def reactions():
         print(f"Reactions iteration: {i}")
         row = {
             'ID': i,
-            'FK_ReactionProfile': random.choice(range(records_nb.PROFILES)),
-            'FK_ReactionPost': random.choice(range(records_nb.POSTS)),
-            'FK_ReactionType': random.choice(range(records_nb.TYPES)),
+            'FK_ReactionProfile': random.randint(0, records_nb.PROFILES-1),
+            'FK_ReactionPost': random.randint(0, records_nb.POSTS-1),
+            'FK_ReactionType': random.randint(0, records_nb.TYPES-1),
             "DateOfReaction": fake.date_this_century().strftime(date_format)
         }
         data.append(row)
@@ -287,8 +287,8 @@ def media():
             'ID': i,
             'PathToResource': path[:500],
             'Size': random.randint(1, 10_000),
-            'FK_Extension': random.choice(range(records_nb.EXTENSIONS) ),
-            'FK_Album': random.choice(range(records_nb.ALBUMS)) if random.random() < 0.15 else None
+            'FK_Extension': random.randint(0, records_nb.EXTENSIONS-1),
+            'FK_Album': random.randint(0, records_nb.ALBUMS-1) if random.random() < 0.15 else None
         }
         data.append(row)
     return data
@@ -301,8 +301,8 @@ def publications():
         print(f"Publications iteration: {i}")
         row = {
             'ID': i,
-            'FK_Media': random.choice(range(records_nb.MEDIA)),
-            'FK_Post': random.choice(range(records_nb.POSTS) )
+            'FK_Media': random.randint(0, records_nb.MEDIA-1),
+            'FK_Post': random.randint(0, records_nb.POSTS-1)
         }
         data.append(row)
     return data
