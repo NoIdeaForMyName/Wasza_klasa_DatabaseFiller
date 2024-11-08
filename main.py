@@ -22,6 +22,9 @@ def insert_rows(cursor, rows, table_name):
     values = [list(row.values()) for row in rows]
     psycopg2.extras.execute_batch(cursor, query, values)
 
+#SELECT setval('profiles_id_seq', (SELECT MAX(id) FROM profiles));
+def update_sequence(cursor, seq_nb, table_name): # len-1
+    cursor.execute(f"SELECT setval('{table_name}_id_seq', (SELECT MAX(id) FROM {table_name}));")
 
 def insert_data(rows, table_name):
     try:
@@ -30,8 +33,9 @@ def insert_data(rows, table_name):
             with conn.cursor() as cursor:
                 # inserting rows to the table
                 insert_rows(cursor,rows,table_name)
+                update_sequence(cursor, len(rows)-1, table_name)
             conn.commit()  # confirming transaction
-        print(f'Table {table_name} filled')
+        print(f'Table {table_name} filled and its sequence was updated')
     except psycopg2.DatabaseError as e:
         print(f"Error during inserting data to the table {table_name}: {e}")
 
